@@ -9,6 +9,8 @@ from functools import reduce
 SPACE_TOKEN = '<space>'
 SPACE_INDEX = 0
 FIRST_INDEX = ord('a') - 1  # 0 is reserved to space
+POLISH_CHARS2INDEX = {u'ą' : 27, u'ć' : 28, u'ę' : 29, u'ł' : 30, u'ń' : 31, u'ó' : 32, u'ś' : 33, u'ź' : 34, u'ż' : 35}
+POLISH_INDICES2CHAR = {v:k for k,v in POLISH_CHARS2INDEX.items()}
 
 def text_to_char_array(original):
     r"""
@@ -16,7 +18,7 @@ def text_to_char_array(original):
     to integers and return a numpy array representing the processed string.
     """
     # Create list of sentence's words w/spaces replaced by ''
-    result = original.replace(" '", "") # TODO: Deal with this properly
+    result = original.replace(" '", "").lower() # TODO: Deal with this properly
     result = result.replace("'", "")    # TODO: Deal with this properly
     result = result.replace(' ', '  ')
     result = result.split(' ')
@@ -24,8 +26,19 @@ def text_to_char_array(original):
     # Tokenize words into letters adding in SPACE_TOKEN where required
     result = np.hstack([SPACE_TOKEN if xt == '' else list(xt) for xt in result])
 
+    # characters from polish alphabet that need special care: ą ć ę ł ń ó ś ź ż
+
+    # validate input sequence
+    for xt in result:
+        if (xt != SPACE_TOKEN and
+        xt not in POLISH_CHARS2INDEX and
+        not ord('a') <= ord(xt) <= ord('z')):
+            raise Exception(u'Can not convert text to array. Original text: [%s]. Problematic character: [%s]' % (original, xt))
+
     # Map characters into indicies
-    result = np.asarray([SPACE_INDEX if xt == SPACE_TOKEN else ord(xt) - FIRST_INDEX for xt in result])
+    result = np.asarray([SPACE_INDEX if xt == SPACE_TOKEN else 
+                       POLISH_CHARS2INDEX[xt] if xt in POLISH_CHARS2INDEX else 
+                       ord(xt) - FIRST_INDEX for xt in result])
 
     # Add result to results
     return result
@@ -65,7 +78,7 @@ def sparse_tuple_to_texts(tuple):
     for i in range(len(indices)):
         index = indices[i][0]
         c = values[i]
-        c = ' ' if c == SPACE_INDEX else chr(c + FIRST_INDEX)
+        c = ' ' if c == SPACE_INDEX else POLISH_INDICES2CHAR[c] if c in POLISH_INDICES2CHAR else chr(c + FIRST_INDEX)
         results[index] = results[index] + c
     # List of strings
     return results
@@ -73,7 +86,9 @@ def sparse_tuple_to_texts(tuple):
 def ndarray_to_text(value):
     results = ''
     for i in range(len(value)):
-        results += chr(value[i] + FIRST_INDEX)
+        v = value[i]
+        c = POLISH_INDICES2CHAR[v] if v in POLISH_INDICES2CHAR else chr(v + FIRST_INDEX)
+        results += c
     return results.replace('`', ' ')
 
 def wer(original, result):

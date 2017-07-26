@@ -257,7 +257,7 @@ def initialize_globals():
 
     # The number of characters in the target language plus one
     global n_character
-    n_character = 29 # TODO: Determine if this should be extended with other punctuation
+    n_character = 35 + 1 + 1 # for Polish: 26 "normal letters" (a-z) + 8 polish leters + space + blank
 
     # The number of units in the sixth layer
     global n_hidden_6
@@ -714,7 +714,7 @@ def calculate_report(results_tuple):
     for label, decoding, distance, loss in items:
         corrected = correction(decoding)
         sample_wer = wer(label, corrected)
-        sample = Sample(label, corrected, loss, distance, sample_wer)
+        sample = Sample(label, decoding, corrected, loss, distance, sample_wer)
         samples.append(sample)
         mean_wer += sample_wer
 
@@ -722,7 +722,7 @@ def calculate_report(results_tuple):
     mean_wer = mean_wer / len(items)
 
     # Filter out all items with WER=0
-    samples = [s for s in samples if s.wer > 0]
+    # samples = [s for s in samples if s.wer > 0]
 
     # Order the remaining items by their loss (lowest loss on top)
     samples.sort(key=lambda s: s.loss)
@@ -820,7 +820,7 @@ def new_id():
     return id_counter
 
 class Sample(object):
-    def __init__(self, src, res, loss, mean_edit_distance, sample_wer):
+    def __init__(self, src, decoding, res, loss, mean_edit_distance, sample_wer):
         '''Represents one item of a WER report.
 
         Args:
@@ -830,13 +830,14 @@ class Sample(object):
             mean_edit_distance (float): computed mean edit distance of this item
         '''
         self.src = src
+        self.decoding = decoding
         self.res = res
         self.loss = loss
         self.mean_edit_distance = mean_edit_distance
         self.wer = sample_wer
 
     def __str__(self):
-        return 'WER: %f, loss: %f, mean edit distance: %f\n - src: "%s"\n - res: "%s"' % (self.wer, self.loss, self.mean_edit_distance, self.src, self.res)
+        return ('WER: %f, loss: %f, mean edit distance: %f\n - src: "%s"\n - decoding: "%s"\n - res: "%s"' % (self.wer, self.loss, self.mean_edit_distance, self.src, self.decoding, self.res)).encode('utf-8')
 
 class WorkerJob(object):
     def __init__(self, epoch_id, index, set_name, steps, report):
