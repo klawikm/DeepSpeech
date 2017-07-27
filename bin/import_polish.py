@@ -12,8 +12,8 @@ sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 import pandas
 
-from tensorflow.contrib.learn.python.learn.datasets import base
-from util.data_set_helpers import DataSets, DataSet
+# from tensorflow.contrib.learn.python.learn.datasets import base
+# from util.feeding import DataSets, DataSet
 
 POLISH_CHARS2INDEX = {u'ą' : 27, u'ć' : 28, u'ę' : 29, u'ł' : 30, u'ń' : 31, u'ó' : 32, u'ś' : 33, u'ź' : 34, u'ż' : 35}
 
