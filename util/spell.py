@@ -18,7 +18,7 @@ def get_model():
 
 def words(text):
     "List of words in text."
-    return re.findall(r'\w+', text.lower())
+    return re.findall(r'\w+', text.lower(), re.UNICODE)
 
 # Load known word set
 with codecs.open('./data/spell/words.txt', 'r', 'utf-8') as f:
