@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import codecs
 import re
 import kenlm
 from heapq import heapify
@@ -20,7 +21,7 @@ def words(text):
     return re.findall(r'\w+', text.lower())
 
 # Load known word set
-with open('./data/spell/words.txt') as f:
+with codecs.open('./data/spell/words.txt', 'r', 'utf-8') as f:
     WORDS = set(words(f.read()))
 
 def log_probability(sentence):
