@@ -18,11 +18,12 @@ python -u DeepSpeech.py \
   --dev_batch_size 10 \
   --test_batch_size 10 \
   --n_hidden 494 \
-  --epoch 2000 \
-  --display_step 10 \
-  --validation_step 10 \
+  --epoch 3 \
+  --display_step 1 \
+  --validation_step 3 \
   --dropout_rate 0.30 \
   --default_stddev 0.046875 \
   --learning_rate 0.0001 \
   --checkpoint_dir "../DeepSpeechPolish" \
+  --export_dir "../DeepSpeechExportedModel" \
   "$@"
